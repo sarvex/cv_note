@@ -142,9 +142,12 @@ class DenseNet(nn.Module):
                 param.data.normal_().mul_(math.sqrt(2. / n))
             elif 'norm' in name and 'weight' in name:
                 param.data.fill_(1)
-            elif 'norm' in name and 'bias' in name:
-                param.data.fill_(0)
-            elif 'classifier' in name and 'bias' in name:
+            elif (
+                'norm' in name
+                and 'bias' in name
+                or 'classifier' in name
+                and 'bias' in name
+            ):
                 param.data.fill_(0)
 
     def forward(self, x):

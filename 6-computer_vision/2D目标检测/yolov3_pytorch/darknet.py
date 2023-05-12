@@ -58,16 +58,27 @@ class DarkNet(nn.Module):
                 m.bias.data.zero_()
 
     def _make_layer(self, planes, blocks):
-        layers = []
-        #  downsample
-        layers.append(("ds_conv", nn.Conv2d(self.inplanes, planes[1], kernel_size=3,
-                                stride=2, padding=1, bias=False)))
+        layers = [
+            (
+                "ds_conv",
+                nn.Conv2d(
+                    self.inplanes,
+                    planes[1],
+                    kernel_size=3,
+                    stride=2,
+                    padding=1,
+                    bias=False,
+                ),
+            )
+        ]
         layers.append(("ds_bn", nn.BatchNorm2d(planes[1])))
         layers.append(("ds_relu", nn.LeakyReLU(0.1)))
         #  blocks
         self.inplanes = planes[1]
-        for i in range(0, blocks):
-            layers.append(("residual_{}".format(i), BasicBlock(self.inplanes, planes)))
+        layers.extend(
+            (f"residual_{i}", BasicBlock(self.inplanes, planes))
+            for i in range(0, blocks)
+        )
         return nn.Sequential(OrderedDict(layers))
 
     def forward(self, x):
@@ -91,7 +102,7 @@ def darknet21(pretrained, **kwargs):
         if isinstance(pretrained, str):
             model.load_state_dict(torch.load(pretrained))
         else:
-            raise Exception("darknet request a pretrained path. got [{}]".format(pretrained))
+            raise Exception(f"darknet request a pretrained path. got [{pretrained}]")
     return model
 
 def darknet53(pretrained, **kwargs):
@@ -102,6 +113,6 @@ def darknet53(pretrained, **kwargs):
         if isinstance(pretrained, str):
             model.load_state_dict(torch.load(pretrained))
         else:
-            raise Exception("darknet request a pretrained path. got [{}]".format(pretrained))
+            raise Exception(f"darknet request a pretrained path. got [{pretrained}]")
     return model
 
